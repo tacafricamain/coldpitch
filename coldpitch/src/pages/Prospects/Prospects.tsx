@@ -221,47 +221,49 @@ export default function Prospects() {
         </div>
 
         {/* Action Bar */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+        <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm border border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
               <button
                 onClick={handleAddProspect}
-                className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
-                Add Prospect
+                <span className="hidden sm:inline">Add Prospect</span>
+                <span className="sm:hidden">Add</span>
               </button>
               <button
                 onClick={handleImport}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 whitespace-nowrap"
               >
                 <Upload className="w-4 h-4" />
-                Import CSV
+                <span className="hidden md:inline">Import CSV</span>
+                <span className="md:hidden">Import</span>
               </button>
               <button
                 onClick={handleExport}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 whitespace-nowrap"
               >
                 <Download className="w-4 h-4" />
-                Export
+                <span className="hidden md:inline">Export</span>
               </button>
             </div>
 
             {selectedProspects.length > 0 && (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-xs sm:text-sm text-gray-600">
                   {selectedProspects.length} selected
                 </span>
                 <button
                   onClick={handleBulkDelete}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                  className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Delete
+                  <span className="hidden sm:inline">Delete</span>
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
+                <button className="hidden sm:flex items-center gap-2 px-3 md:px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
                   <Mail className="w-4 h-4" />
-                  Send Email
+                  <span className="hidden md:inline">Send Email</span>
                 </button>
               </div>
             )}

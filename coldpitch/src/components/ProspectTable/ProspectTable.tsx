@@ -82,23 +82,23 @@ export default function ProspectTable({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-semibold text-gray-900">Prospect list</h3>
+      <div className="p-3 md:p-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h3 className="text-base md:text-lg font-semibold text-gray-900">Prospect list</h3>
           
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+            <div className="relative flex-shrink-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange?.(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm text-gray-900"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm text-gray-900 w-40 sm:w-auto"
               />
             </div>
             
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-700">
+            <button className="hidden md:flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-gray-700 whitespace-nowrap">
               <Filter className="w-4 h-4" />
               Filter
             </button>
@@ -106,7 +106,7 @@ export default function ProspectTable({
             <select 
               value={statusFilter}
               onChange={(e) => onStatusFilterChange?.(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm text-gray-900"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm text-gray-900 flex-shrink-0"
             >
               <option value="all">All status</option>
               <option value="New">New</option>
@@ -122,7 +122,7 @@ export default function ProspectTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[640px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-4 py-3 text-left">

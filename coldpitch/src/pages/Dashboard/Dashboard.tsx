@@ -7,7 +7,7 @@ import CampaignList from '../../components/CampaignList/CampaignList';
 import ProspectTable from '../../components/ProspectTable/ProspectTable';
 import { useAppStore } from '../../stores/useAppStore';
 
-// Mock data - In production, this would come from your API
+// Mock data - In production, this would come from my API
 const mockKPIs = {
   totalProspects: 579,
   prospectChange: 16,

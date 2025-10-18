@@ -127,13 +127,6 @@ export default function Login() {
               )}
             </button>
           </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-xs font-medium text-gray-700 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-gray-600">Email: contact.jahswill@gmail.com</p>
-            <p className="text-xs text-gray-600">Password: spex12+++</p>
-          </div>
         </div>
 
         {/* Footer */}

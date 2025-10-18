@@ -6,7 +6,6 @@ import OverviewChart from '../../components/Chart/OverviewChart';
 import CampaignList from '../../components/CampaignList/CampaignList';
 import ProspectTable from '../../components/ProspectTable/ProspectTable';
 import { useAppStore } from '../../stores/useAppStore';
-import { useAuth } from '../../hooks/useAuth';
 
 // Mock data - In production, this would come from your API
 const mockKPIs = {
@@ -134,7 +133,6 @@ const mockProspects = [
 
 export default function Dashboard() {
   const { setKpis, setChartData, setActivities, setProspects } = useAppStore();
-  const { user } = useAuth();
 
   useEffect(() => {
     // In production, fetch data from API

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Edit, Eye, DollarSign, Printer, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Trash2, Edit, DollarSign, Printer, CheckCircle, XCircle, Clock, X } from 'lucide-react';
 import Navbar from '../../components/Navbar/Navbar';
 import InvoiceModal from '../../components/InvoiceModal/InvoiceModal';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';

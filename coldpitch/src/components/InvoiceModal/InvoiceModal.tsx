@@ -340,7 +340,7 @@ export default function InvoiceModal({ isOpen, onClose, onSave, invoice, mode }:
             </div>
 
             <div className="space-y-3">
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <div key={item.id} className="flex gap-3 items-start">
                   <div className="flex-1 grid grid-cols-12 gap-3">
                     <div className="col-span-5">

@@ -127,8 +127,8 @@ export default function Sidebar() {
   const MobileBottomNav = () => (
     <>
       {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 safe-area-inset-bottom z-50">
-        <div className="flex items-center justify-around px-2 py-3">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 safe-area-inset-bottom z-50 touch-none">
+        <div className="flex items-center justify-around px-2 py-3"  style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {menuItems.slice(0, 4).map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;

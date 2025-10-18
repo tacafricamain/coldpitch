@@ -356,7 +356,8 @@ export default function StaffPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-start gap-2 ml-4">
+                      {/* Hide time logged in, edit, and delete buttons on mobile */}
+                      <div className="hidden md:flex items-start gap-2 ml-4">
                         <div className="text-right text-sm mr-2">
                           <p className="text-gray-500">
                             <Clock className="w-4 h-4 inline mr-1" />

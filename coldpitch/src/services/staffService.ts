@@ -371,6 +371,7 @@ export const staffService = {
   // Delete a staff member
   async deleteStaff(id: string, currentUserId?: string, currentUserName?: string): Promise<void> {
     console.log('🗑️ Attempting to delete staff:', id);
+    console.log('🔑 Supabase client configured:', !!supabase);
     
     // Get staff info before deleting for activity log
     const { data: staffToDelete, error: fetchError } = await supabase
@@ -381,6 +382,12 @@ export const staffService = {
 
     if (fetchError) {
       console.error('❌ Failed to fetch staff for deletion:', fetchError);
+      console.error('Error details:', {
+        message: fetchError.message,
+        code: fetchError.code,
+        details: fetchError.details,
+        hint: fetchError.hint,
+      });
       throw fetchError;
     }
 
@@ -408,17 +415,43 @@ export const staffService = {
 
     // Delete the staff database record
     console.log('🗑️ Deleting staff record from database...');
-    const { error: deleteError } = await supabase
+    console.log('🔍 Delete query: DELETE FROM staff WHERE id =', id);
+    
+    const { error: deleteError, data: deleteData } = await supabase
       .from('staff')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select(); // Add select to see what was deleted
+
+    console.log('Delete response:', { error: deleteError, data: deleteData });
 
     if (deleteError) {
       console.error('❌ Failed to delete staff record:', deleteError);
+      console.error('Delete error details:', {
+        message: deleteError.message,
+        code: deleteError.code,
+        details: deleteError.details,
+        hint: deleteError.hint,
+        status: (deleteError as any).status,
+      });
+      
+      // Check for common RLS issues
+      if (deleteError.code === 'PGRST301' || deleteError.message.includes('row-level security')) {
+        console.error('🚨 ROW LEVEL SECURITY ISSUE!');
+        console.error('💡 The anon key may not have permission to delete');
+        console.error('💡 Check Supabase Dashboard → Authentication → Policies');
+        console.error('💡 Or disable RLS: ALTER TABLE staff DISABLE ROW LEVEL SECURITY;');
+      }
+      
       throw deleteError;
     }
 
-    console.log('✅ Staff record deleted');
+    if (!deleteData || deleteData.length === 0) {
+      console.warn('⚠️ Delete returned no data - staff may not exist or delete failed silently');
+      console.warn('🔍 This could mean RLS is blocking the delete');
+    } else {
+      console.log('✅ Staff record deleted successfully:', deleteData);
+    }
 
     // Try to delete the auth user (admin only operation)
     // Note: This requires service role key, so it may fail for regular users

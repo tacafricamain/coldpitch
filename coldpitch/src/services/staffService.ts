@@ -234,9 +234,37 @@ export const staffService = {
     const avatar_seed = staffData.name?.toLowerCase().replace(/\s+/g, '') || Math.random().toString(36).substring(7);
     const password = generatePassword(12);
     
+    // Create Supabase Auth user first
+    let authUserId: string | undefined;
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: staffData.email!,
+        password: password,
+        options: {
+          data: {
+            name: staffData.name,
+            role: staffData.role,
+          }
+        }
+      });
+
+      if (authError) {
+        console.error('❌ Failed to create auth user:', authError);
+        throw new Error(`Failed to create auth user: ${authError.message}`);
+      }
+
+      authUserId = authData.user?.id;
+      console.log('✅ Auth user created:', authUserId);
+    } catch (authErr) {
+      console.error('❌ Auth creation failed:', authErr);
+      throw authErr;
+    }
+    
+    // Create staff database record with auth user ID
     const { data, error } = await supabase
       .from('staff')
       .insert([{
+        id: authUserId, // Use auth user ID as staff ID
         ...staffData,
         avatar_seed,
         login_times: [],
@@ -246,7 +274,11 @@ export const staffService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // If staff creation fails, try to clean up auth user
+      console.error('❌ Failed to create staff record:', error);
+      throw error;
+    }
 
     // Log the activity (non-fatal if it fails)
     if (currentUserId && currentUserName) {
@@ -325,12 +357,21 @@ export const staffService = {
 
   // Delete a staff member
   async deleteStaff(id: string, currentUserId?: string, currentUserName?: string): Promise<void> {
+    console.log('🗑️ Attempting to delete staff:', id);
+    
     // Get staff info before deleting for activity log
-    const { data: staffToDelete } = await supabase
+    const { data: staffToDelete, error: fetchError } = await supabase
       .from('staff')
       .select('name, email')
       .eq('id', id)
       .single();
+
+    if (fetchError) {
+      console.error('❌ Failed to fetch staff for deletion:', fetchError);
+      throw fetchError;
+    }
+
+    console.log('✅ Staff to delete:', staffToDelete);
 
     // Log the activity BEFORE deleting (to avoid foreign key constraint)
     if (currentUserId && currentUserName && staffToDelete) {
@@ -346,18 +387,40 @@ export const staffService = {
             email: staffToDelete.email 
           },
         });
+        console.log('✅ Activity logged');
       } catch (logError) {
-        console.warn('Failed to log activity (non-fatal):', logError);
+        console.warn('⚠️ Failed to log activity (non-fatal):', logError);
       }
     }
 
-    // Now delete the staff member
-    const { error } = await supabase
+    // Delete the staff database record
+    console.log('🗑️ Deleting staff record from database...');
+    const { error: deleteError } = await supabase
       .from('staff')
       .delete()
       .eq('id', id);
 
-    if (error) throw error;
+    if (deleteError) {
+      console.error('❌ Failed to delete staff record:', deleteError);
+      throw deleteError;
+    }
+
+    console.log('✅ Staff record deleted');
+
+    // Try to delete the auth user (admin only operation)
+    // Note: This requires service role key, so it may fail for regular users
+    try {
+      console.log('🗑️ Attempting to delete auth user...');
+      const { error: authDeleteError } = await supabase.auth.admin.deleteUser(id);
+      
+      if (authDeleteError) {
+        console.warn('⚠️ Could not delete auth user (may require admin permissions):', authDeleteError.message);
+      } else {
+        console.log('✅ Auth user deleted');
+      }
+    } catch (authErr) {
+      console.warn('⚠️ Auth user deletion not available (non-fatal):', authErr);
+    }
   },
 
   // Record a login time

@@ -120,10 +120,13 @@ export default function StaffPage() {
     if (!deletingStaff) return;
 
     try {
+      console.log('🗑️ Delete confirmation - Staff:', deletingStaff);
       const currentUserId = staff[0]?.id || 'admin-user-id';
       const currentUserName = staff[0]?.name || 'Admin User';
+      console.log('👤 Current user:', currentUserId, currentUserName);
 
       await staffService.deleteStaff(deletingStaff.id, currentUserId, currentUserName);
+      
       setStaff(staff.filter(s => s.id !== deletingStaff.id));
       success('Staff deleted', `${deletingStaff.name} has been removed from the team`);
       
@@ -131,11 +134,20 @@ export default function StaffPage() {
       setDeletingStaff(null);
       
       // Reload activity logs
+      console.log('🔄 Reloading activity logs...');
       const logs = await staffService.getActivityLogs(undefined, 100);
       setActivityLogs(logs);
-    } catch (err) {
-      showError('Delete failed', 'An error occurred while deleting staff member');
-      console.error(err);
+      console.log('✅ Activity logs reloaded:', logs.length, 'entries');
+    } catch (err: any) {
+      const errorMessage = err?.message || 'An error occurred while deleting staff member';
+      showError('Delete failed', errorMessage);
+      console.error('❌ Delete error:', err);
+      console.error('Error details:', {
+        message: err?.message,
+        code: err?.code,
+        details: err?.details,
+        hint: err?.hint,
+      });
     }
   };
 

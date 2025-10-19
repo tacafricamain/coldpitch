@@ -37,96 +37,99 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Check credentials
-    if (email === MOCK_EMAIL && password === MOCK_PASSWORD) {
-      // Fetch the actual staff member from database to get real UUID
-      try {
-        console.log('Fetching staff member from database...');
-        console.log('Email to search:', email);
+    try {
+      // Try Supabase Auth first
+      console.log('🔐 Attempting login with Supabase Auth...');
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        console.warn('⚠️ Supabase Auth failed:', authError.message);
         
-        const { data: staffMember, error: staffError } = await supabase
-          .from('staff')
-          .select('id, name, email, role')
-          .eq('email', email)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid 406 error
-
-        console.log('Query result - Data:', staffMember);
-        console.log('Query result - Error:', staffError);
-
-        if (staffError) {
-          console.error('❌ Supabase error:', staffError);
-          throw staffError;
-        }
-
-        if (!staffMember) {
-          console.error('❌ No staff member found for email:', email);
-          console.log('🔍 Let me try to list all staff to debug...');
+        // Fallback to hardcoded admin credentials
+        if (email === MOCK_EMAIL && password === MOCK_PASSWORD) {
+          console.log('✅ Using hardcoded admin credentials');
           
-          // Debug: Try to get all staff
-          const { data: allStaff, error: allError } = await supabase
+          const { data: staffMember } = await supabase
             .from('staff')
-            .select('id, email')
-            .limit(10);
-          
-          console.log('All staff in database:', allStaff);
-          console.log('All staff error:', allError);
-          
-          throw new Error('Staff member not found');
-        }
+            .select('id, name, email, role')
+            .eq('email', email)
+            .maybeSingle();
 
-        console.log('✅ Staff member found:', staffMember);
-        console.log('   UUID:', staffMember.id);
-        console.log('   Type:', typeof staffMember.id);
-
-        const mockUser: User = {
-          id: staffMember.id,
-          name: staffMember.name,
-          email: staffMember.email,
-          role: staffMember.role,
-        };
-        
-        // Store user and token
-        localStorage.setItem('auth_user', JSON.stringify(mockUser));
-        localStorage.setItem('auth_token', 'mock-jwt-token-' + Date.now());
-        
-        setUser(mockUser);
-        
-        // Record login activity with real UUID
-        try {
-          await staffService.recordLogin(mockUser.id, mockUser.name);
-          console.log('✅ Login activity recorded');
-        } catch (error) {
-          console.warn('Failed to record login activity (non-fatal):', error);
+          const mockUser: User = staffMember || {
+            id: '1',
+            name: 'Spex Admin',
+            email: MOCK_EMAIL,
+            role: 'Admin',
+          };
+          
+          localStorage.setItem('auth_user', JSON.stringify(mockUser));
+          localStorage.setItem('auth_token', 'mock-jwt-token-' + Date.now());
+          setUser(mockUser);
+          
+          if (staffMember) {
+            try {
+              await staffService.recordLogin(mockUser.id, mockUser.name);
+            } catch (error) {
+              console.warn('Failed to record login activity:', error);
+            }
+          }
+          
+          setIsLoading(false);
+          return true;
         }
         
         setIsLoading(false);
-        return true;
-      } catch (error) {
-        console.error('❌ Failed to fetch staff member from database:', error);
-        console.log('Using fallback mock user');
-        
-        // Fallback to mock user if database query fails
-        const mockUser: User = {
-          id: '1',
-          name: 'Spex Admin',
-          email: MOCK_EMAIL,
-          role: 'Admin',
-        };
-        
-        localStorage.setItem('auth_user', JSON.stringify(mockUser));
-        localStorage.setItem('auth_token', 'mock-jwt-token-' + Date.now());
-        
-        setUser(mockUser);
-        setIsLoading(false);
-        return true;
+        return false;
       }
+
+      // Auth successful - get staff data
+      console.log('✅ Supabase Auth successful');
+      const userId = authData.user.id;
+      
+      const { data: staffMember, error: staffError } = await supabase
+        .from('staff')
+        .select('id, name, email, role')
+        .eq('id', userId)
+        .single();
+
+      if (staffError || !staffMember) {
+        console.error('❌ Staff record not found for auth user:', userId);
+        await supabase.auth.signOut();
+        setIsLoading(false);
+        return false;
+      }
+
+      const user: User = {
+        id: staffMember.id,
+        name: staffMember.name,
+        email: staffMember.email,
+        role: staffMember.role,
+      };
+      
+      // Store user and token
+      localStorage.setItem('auth_user', JSON.stringify(user));
+      localStorage.setItem('auth_token', authData.session?.access_token || 'mock-token');
+      
+      setUser(user);
+      
+      // Record login activity
+      try {
+        await staffService.recordLogin(user.id, user.name);
+        console.log('✅ Login activity recorded');
+      } catch (error) {
+        console.warn('Failed to record login activity (non-fatal):', error);
+      }
+      
+      setIsLoading(false);
+      return true;
+    } catch (error) {
+      console.error('❌ Login error:', error);
+      setIsLoading(false);
+      return false;
     }
-    
-    setIsLoading(false);
-    return false;
   };
 
   const logout = () => {

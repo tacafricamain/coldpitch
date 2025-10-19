@@ -70,7 +70,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="contact.jahswill@gmail.com"
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none text-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Enter your password"
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none text-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -130,12 +130,6 @@ export default function Login() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-600 mt-8">
-          Don't have an account?{' '}
-          <button className="text-primary-600 hover:text-primary-700 font-medium">
-            Contact sales
-          </button>
-        </p>
       </div>
     </div>
   );

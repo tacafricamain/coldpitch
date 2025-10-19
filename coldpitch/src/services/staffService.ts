@@ -43,10 +43,8 @@ const sendCredentialsEmail = async (email: string, password: string, name: strin
   
   // Send email via serverless function (works locally and on Vercel)
   try {
-    // Use proper URL for production
-    const apiUrl = import.meta.env.DEV 
-      ? 'http://localhost:3001/api/send-credentials'  // Local development
-      : `${window.location.origin}/api/send-credentials`;  // Production (Vercel serverless)
+    // Always use the current origin - Vercel will route /api/* to serverless functions
+    const apiUrl = `${window.location.origin}/api/send-credentials`;
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -458,9 +456,8 @@ export const staffService = {
     try {
       console.log('🗑️ Attempting to delete auth user via API...');
       
-      const apiUrl = import.meta.env.DEV 
-        ? 'http://localhost:3001/api/delete-auth-user'
-        : `${window.location.origin}/api/delete-auth-user`;
+      // Always use the current origin - Vercel will route /api/* to serverless functions
+      const apiUrl = `${window.location.origin}/api/delete-auth-user`;
       
       const authDeleteResponse = await fetch(apiUrl, {
         method: 'POST',

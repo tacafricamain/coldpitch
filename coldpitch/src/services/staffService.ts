@@ -249,15 +249,28 @@ export const staffService = {
         }
       });
 
-      if (authError) {
-        console.error('❌ Failed to create auth user:', authError);
-        throw new Error(`Failed to create auth user: ${authError.message}`);
-      }
-
+      // Check if user was actually created despite the error
       authUserId = authData.user?.id;
-      const emailConfirmed = authData.user?.email_confirmed_at;
       
-      console.log('✅ Auth user created:', authUserId);
+      if (authError) {
+        console.error('⚠️ Auth signup returned error:', authError);
+        
+        // If user was created despite the error (common with email confirmation enabled)
+        if (authUserId) {
+          console.log('✅ Auth user created successfully despite error:', authUserId);
+          console.warn('💡 This error is likely due to email confirmation being enabled');
+          console.warn('   → To fix: Supabase Dashboard → Authentication → Settings → Email Confirmations → OFF');
+          // Continue with the flow - user was created successfully
+        } else {
+          // No user ID means it really failed
+          console.error('❌ Failed to create auth user - no user ID returned');
+          throw new Error(`Failed to create auth user: ${authError.message}`);
+        }
+      } else {
+        console.log('✅ Auth user created:', authUserId);
+      }
+      
+      const emailConfirmed = authData.user?.email_confirmed_at;
       console.log('📧 Email confirmed:', emailConfirmed ? 'Yes' : 'No (requires confirmation)');
       
       // If email is not auto-confirmed, warn the admin

@@ -453,19 +453,37 @@ export const staffService = {
       console.log('✅ Staff record deleted successfully:', deleteData);
     }
 
-    // Try to delete the auth user (admin only operation)
-    // Note: This requires service role key, so it may fail for regular users
+    // Delete the auth user via serverless function
+    // This requires service role key which can't be exposed to client
     try {
-      console.log('🗑️ Attempting to delete auth user...');
-      const { error: authDeleteError } = await supabase.auth.admin.deleteUser(id);
+      console.log('🗑️ Attempting to delete auth user via API...');
       
-      if (authDeleteError) {
-        console.warn('⚠️ Could not delete auth user (may require admin permissions):', authDeleteError.message);
+      const apiUrl = import.meta.env.DEV 
+        ? 'http://localhost:3001/api/delete-auth-user'
+        : `${window.location.origin}/api/delete-auth-user`;
+      
+      const authDeleteResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: id })
+      });
+
+      if (authDeleteResponse.ok) {
+        const result = await authDeleteResponse.json();
+        console.log('✅ Auth user deleted:', result);
       } else {
-        console.log('✅ Auth user deleted');
+        const error = await authDeleteResponse.json();
+        console.warn('⚠️ Could not delete auth user:', error.error || 'Unknown error');
+        console.warn('Details:', error.details || 'No details available');
+        // Don't throw - staff record is already deleted
       }
-    } catch (authErr) {
-      console.warn('⚠️ Auth user deletion not available (non-fatal):', authErr);
+    } catch (authErr: any) {
+      console.warn('⚠️ Auth user deletion failed (non-fatal):', authErr.message);
+      console.warn('💡 Staff record deleted but auth user may still exist');
+      console.warn('💡 Set SUPABASE_SERVICE_ROLE_KEY in Vercel environment variables');
+      // Don't throw - staff record is already deleted, this is just cleanup
     }
   },
 

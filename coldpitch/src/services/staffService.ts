@@ -237,6 +237,7 @@ export const staffService = {
     // Create Supabase Auth user first
     let authUserId: string | undefined;
     try {
+      // Sign up with autoConfirm option (requires appropriate Supabase settings)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: staffData.email!,
         password: password,
@@ -244,7 +245,9 @@ export const staffService = {
           data: {
             name: staffData.name,
             role: staffData.role,
-          }
+          },
+          // Skip email confirmation - user is added by admin
+          emailRedirectTo: undefined,
         }
       });
 
@@ -254,7 +257,17 @@ export const staffService = {
       }
 
       authUserId = authData.user?.id;
+      const emailConfirmed = authData.user?.email_confirmed_at;
+      
       console.log('✅ Auth user created:', authUserId);
+      console.log('📧 Email confirmed:', emailConfirmed ? 'Yes' : 'No (requires confirmation)');
+      
+      // If email is not auto-confirmed, warn the admin
+      if (!emailConfirmed) {
+        console.warn('⚠️ IMPORTANT: User must confirm email before login!');
+        console.warn('💡 To fix: Disable email confirmation in Supabase Dashboard');
+        console.warn('   → Authentication → Settings → Email Confirmations → OFF');
+      }
     } catch (authErr) {
       console.error('❌ Auth creation failed:', authErr);
       throw authErr;

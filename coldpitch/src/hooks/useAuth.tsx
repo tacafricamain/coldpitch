@@ -46,7 +46,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (authError) {
-        console.warn('⚠️ Supabase Auth failed:', authError.message);
+        console.error('❌ Supabase Auth failed:', authError.message);
+        console.error('Error code:', authError.status);
+        
+        // Check for email not confirmed error
+        if (authError.message.includes('Email not confirmed') || 
+            authError.message.includes('email_not_confirmed')) {
+          console.error('🚨 EMAIL NOT CONFIRMED!');
+          console.error('💡 Fix: Go to Supabase Dashboard → Authentication → Settings');
+          console.error('💡 Disable "Email Confirmations" to allow immediate login');
+          console.error('💡 Or have user click confirmation link in their email');
+        }
         
         // Fallback to hardcoded admin credentials
         if (email === MOCK_EMAIL && password === MOCK_PASSWORD) {

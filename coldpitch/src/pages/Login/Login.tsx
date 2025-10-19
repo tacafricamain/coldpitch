@@ -69,7 +69,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="Enter email here"
+                  placeholder="Enter e here"
                   className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none text-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>

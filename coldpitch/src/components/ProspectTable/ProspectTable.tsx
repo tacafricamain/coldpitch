@@ -108,13 +108,11 @@ export default function ProspectTable({
               onChange={(e) => onStatusFilterChange?.(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm text-gray-900 flex-shrink-0"
             >
-              <option value="all">All status</option>
+              <option value="all">All</option>
               <option value="New">New</option>
               <option value="Contacted">Contacted</option>
               <option value="Replied">Replied</option>
-              <option value="Qualified">Qualified</option>
               <option value="Converted">Converted</option>
-              <option value="Unsubscribed">Unsubscribed</option>
             </select>
           </div>
         </div>
@@ -122,10 +120,10 @@ export default function ProspectTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px]">
+        <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left hidden md:table-cell">
                 <input
                   type="checkbox"
                   checked={selectAll}
@@ -136,13 +134,13 @@ export default function ProspectTable({
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Company
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Date Added
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                 Prospect ID
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -150,8 +148,12 @@ export default function ProspectTable({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {prospects.map((prospect) => (
-              <tr key={prospect.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4">
+              <tr 
+                key={prospect.id} 
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => onView?.(prospect)}
+              >
+                <td className="px-4 py-4 hidden md:table-cell" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(prospect.id)}
@@ -168,8 +170,8 @@ export default function ProspectTable({
                         className="w-10 h-10 rounded-full"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-sm font-medium text-gray-600">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                        <span className="text-sm font-medium text-white">
                           {prospect.name.charAt(0)}
                         </span>
                       </div>
@@ -177,26 +179,29 @@ export default function ProspectTable({
                     <div>
                       <p className="text-sm font-medium text-gray-900">{prospect.company || 'N/A'}</p>
                       <p className="text-sm text-gray-500">{prospect.email}</p>
+                      <span className={`md:hidden inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${getStatusColor(prospect.status)}`}>
+                        {prospect.status}
+                      </span>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-900">
+                <td className="px-4 py-4 text-sm text-gray-900 hidden md:table-cell">
                   {prospect.dateAdded}
                 </td>
-                <td className="px-4 py-4">
+                <td className="px-4 py-4 hidden md:table-cell">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(prospect.status)}`}>
                     {prospect.status}
                   </span>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-500">
+                <td className="px-4 py-4 text-sm text-gray-500 hidden md:table-cell">
                   {prospect.id}
                 </td>
-                <td className="px-4 py-4">
+                <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center gap-2 relative">
                     {onEdit && (
                       <button
                         onClick={() => onEdit(prospect)}
-                        className="p-1 hover:bg-blue-50 rounded text-blue-600"
+                        className="p-1 hover:bg-blue-50 rounded text-blue-600 hidden md:block"
                         title="Edit prospect"
                       >
                         <Edit className="w-4 h-4" />

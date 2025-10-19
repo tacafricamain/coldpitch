@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ColdPitch Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 5px;
+        }
+        button {
+            background: #9333EA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #7E22CE;
+        }
+        .instructions {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ColdPitch Icon Generator</h1>
+    
+    <div class="instructions">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Click "Generate Icons" button below</li>
+            <li>Right-click each icon and "Save image as..."</li>
+            <li>Save with the exact filename shown (e.g., icon-72x72.png)</li>
+            <li>Place all icons in the <code>public/</code> folder</li>
+        </ol>
+    </div>
+
+    <button onclick="generateAllIcons()">Generate All Icons</button>
+    <button onclick="downloadAll()">Download All (Bulk)</button>
+
+    <div id="icons"></div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const canvases = {};
+
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Purple background
+            ctx.fillStyle = '#9333EA';
+            ctx.fillRect(0, 0, size, size);
+
+            // Rounded corners effect (optional)
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            const radius = size * 0.15; // 15% rounded corners
+            ctx.moveTo(radius, 0);
+            ctx.lineTo(size - radius, 0);
+            ctx.quadraticCurveTo(size, 0, size, radius);
+            ctx.lineTo(size, size - radius);
+            ctx.quadraticCurveTo(size, size, size - radius, size);
+            ctx.lineTo(radius, size);
+            ctx.quadraticCurveTo(0, size, 0, size - radius);
+            ctx.lineTo(0, radius);
+            ctx.quadraticCurveTo(0, 0, radius, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            // Reset composite operation
+            ctx.globalCompositeOperation = 'source-over';
+
+            // White "C" letter
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('C', size / 2, size / 2);
+
+            return canvas;
+        }
+
+        function generateAllIcons() {
+            const container = document.getElementById('icons');
+            container.innerHTML = '';
+
+            sizes.forEach(size => {
+                const canvas = generateIcon(size);
+                canvases[size] = canvas;
+
+                const div = document.createElement('div');
+                div.className = 'icon-preview';
+
+                const label = document.createElement('div');
+                label.textContent = `${size}x${size}`;
+                label.style.fontWeight = 'bold';
+
+                const filename = document.createElement('div');
+                filename.textContent = `icon-${size}x${size}.png`;
+                filename.style.fontSize = '12px';
+                filename.style.color = '#666';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download';
+                downloadBtn.onclick = () => downloadIcon(canvas, size);
+
+                div.appendChild(label);
+                div.appendChild(canvas);
+                div.appendChild(filename);
+                div.appendChild(downloadBtn);
+
+                container.appendChild(div);
+            });
+        }
+
+        function downloadIcon(canvas, size) {
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadAll() {
+            if (Object.keys(canvases).length === 0) {
+                generateAllIcons();
+                setTimeout(downloadAll, 100);
+                return;
+            }
+
+            sizes.forEach((size, index) => {
+                setTimeout(() => {
+                    downloadIcon(canvases[size], size);
+                }, index * 200); // Stagger downloads
+            });
+        }
+
+        // Generate on load
+        window.onload = generateAllIcons;
+    </script>
+</body>
+</html>

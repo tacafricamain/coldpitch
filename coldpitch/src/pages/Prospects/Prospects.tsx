@@ -3,6 +3,7 @@ import { Plus, Upload, Download, Trash2, Mail } from 'lucide-react';
 import Navbar from '../../components/Navbar/Navbar';
 import ProspectTable from '../../components/ProspectTable/ProspectTable';
 import ProspectModal from '../../components/ProspectModal/ProspectModal';
+import ProspectDetailsModal from '../../components/ProspectDetailsModal/ProspectDetailsModal';
 import ImportModal from '../../components/ProspectModal/ImportModal';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/ToastContext';
@@ -22,6 +23,8 @@ export default function Prospects() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [viewingProspect, setViewingProspect] = useState<Prospect | null>(null);
   const [deletingProspect, setDeletingProspect] = useState<Prospect | null>(null);
   const [editingProspect, setEditingProspect] = useState<Prospect | null>(null);
 
@@ -148,6 +151,11 @@ export default function Prospects() {
     setShowAddModal(true);
   };
 
+  const handleViewProspect = (prospect: Prospect) => {
+    setViewingProspect(prospect);
+    setShowDetailsModal(true);
+  };
+
   const handleSaveProspect = async (prospectData: Partial<Prospect>) => {
     try {
       if (editingProspect) {
@@ -184,7 +192,7 @@ export default function Prospects() {
     total: prospects.length,
     new: prospects.filter(p => p.status === 'New').length,
     contacted: prospects.filter(p => p.status === 'Contacted').length,
-    qualified: prospects.filter(p => p.status === 'Qualified').length,
+    replied: prospects.filter(p => p.status === 'Replied').length,
     converted: prospects.filter(p => p.status === 'Converted').length,
   };
 
@@ -197,26 +205,26 @@ export default function Prospects() {
 
       <div className="p-6 space-y-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 font-medium">Total Prospects</p>
-            <p className="text-2xl font-semibold text-gray-900 mt-1">{stats.total}</p>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+          <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm border border-gray-100">
+            <p className="text-xs md:text-sm text-gray-500 font-medium">All</p>
+            <p className="text-xl md:text-2xl font-semibold text-gray-900 mt-1">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 font-medium">New</p>
-            <p className="text-2xl font-semibold text-blue-600 mt-1">{stats.new}</p>
+          <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm border border-gray-100">
+            <p className="text-xs md:text-sm text-gray-500 font-medium">New</p>
+            <p className="text-xl md:text-2xl font-semibold text-blue-600 mt-1">{stats.new}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 font-medium">Contacted</p>
-            <p className="text-2xl font-semibold text-purple-600 mt-1">{stats.contacted}</p>
+          <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm border border-gray-100">
+            <p className="text-xs md:text-sm text-gray-500 font-medium">Contacted</p>
+            <p className="text-xl md:text-2xl font-semibold text-purple-600 mt-1">{stats.contacted}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 font-medium">Qualified</p>
-            <p className="text-2xl font-semibold text-yellow-600 mt-1">{stats.qualified}</p>
+          <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm border border-gray-100">
+            <p className="text-xs md:text-sm text-gray-500 font-medium">Replied</p>
+            <p className="text-xl md:text-2xl font-semibold text-green-600 mt-1">{stats.replied}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <p className="text-sm text-gray-500 font-medium">Converted</p>
-            <p className="text-2xl font-semibold text-green-600 mt-1">{stats.converted}</p>
+          <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm border border-gray-100">
+            <p className="text-xs md:text-sm text-gray-500 font-medium">Converted</p>
+            <p className="text-xl md:text-2xl font-semibold text-yellow-600 mt-1">{stats.converted}</p>
           </div>
         </div>
 
@@ -283,6 +291,7 @@ export default function Prospects() {
             selectedIds={selectedProspects}
             onEdit={handleEditProspect}
             onDelete={handleDeleteOne}
+            onView={handleViewProspect}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             statusFilter={statusFilter}
@@ -292,6 +301,16 @@ export default function Prospects() {
       </div>
 
       {/* Modals */}
+      <ProspectDetailsModal
+        isOpen={showDetailsModal}
+        prospect={viewingProspect}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setViewingProspect(null);
+        }}
+        onEdit={handleEditProspect}
+      />
+
       <ProspectModal
         isOpen={showAddModal}
         prospect={editingProspect}

@@ -195,12 +195,62 @@ export default function Settings() {
     <div className="min-h-screen bg-gray-50">
       <Navbar title="Settings" />
 
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="max-w-6xl mx-auto">
+          {/* Mobile Tabs (Horizontal scroll) */}
+          <div className="md:hidden mb-4 overflow-x-auto">
+            <div className="flex gap-2 pb-2">
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'profile'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-200'
+                }`}
+              >
+                <User className="w-4 h-4" />
+                Profile
+              </button>
+              <button
+                onClick={() => setActiveTab('notifications')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'notifications'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-200'
+                }`}
+              >
+                <Bell className="w-4 h-4" />
+                Notifications
+              </button>
+              <button
+                onClick={() => setActiveTab('api')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'api'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-200'
+                }`}
+              >
+                <Key className="w-4 h-4" />
+                API Keys
+              </button>
+              <button
+                onClick={() => setActiveTab('team')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeTab === 'team'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-200'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                Team
+              </button>
+            </div>
+          </div>
+
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-            <div className="grid grid-cols-4">
-              {/* Sidebar */}
-              <div className="col-span-1 bg-gray-50 border-r border-gray-200 p-4">
+            <div className="md:grid md:grid-cols-4">
+              {/* Desktop Sidebar */}
+              <div className="hidden md:block col-span-1 bg-gray-50 border-r border-gray-200 p-4">
                 <nav className="space-y-1">
                   <button
                     onClick={() => setActiveTab('profile')}
@@ -250,7 +300,7 @@ export default function Settings() {
               </div>
 
               {/* Content */}
-              <div className="col-span-3 p-6">
+              <div className="md:col-span-3 p-4 md:p-6">
                 {/* Profile Tab */}
                 {activeTab === 'profile' && settings && (
                   <div className="space-y-6">

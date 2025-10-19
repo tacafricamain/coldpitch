@@ -14,9 +14,9 @@ export default function Layout() {
       
       {/* Main Content */}
       <div
-        className={`transition-all duration-300 md:${
-          sidebarCollapsed ? 'ml-20' : 'ml-64'
-        } pb-20 md:pb-0`}
+        className={`transition-all duration-300 pb-24 md:pt-0 md:pb-0 ${
+          sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'
+        }`}
       >
         <Outlet />
       </div>

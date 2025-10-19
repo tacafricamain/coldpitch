@@ -7,6 +7,7 @@ import Login from './pages/Login/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Prospects from './pages/Prospects/Prospects';
 import Invoices from './pages/Invoices/Invoices';
+import Clients from './pages/Clients/Clients';
 import Settings from './pages/Settings/Settings';
 import Staff from './pages/Staff/Staff';
 
@@ -32,6 +33,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="prospects" element={<Prospects />} />
               <Route path="invoices" element={<Invoices />} />
+              <Route path="clients" element={<Clients />} />
               <Route path="staff" element={<Staff />} />
               <Route path="settings" element={<Settings />} />
             </Route>

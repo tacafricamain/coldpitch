@@ -43,10 +43,10 @@ const sendCredentialsEmail = async (email: string, password: string, name: strin
   
   // Send email via serverless function (works locally and on Vercel)
   try {
-    // Use relative URL for serverless function (works in both dev and production)
+    // Use proper URL for production
     const apiUrl = import.meta.env.DEV 
       ? 'http://localhost:3001/api/send-credentials'  // Local development
-      : '/api/send-credentials';  // Production (Vercel serverless)
+      : `${window.location.origin}/api/send-credentials`;  // Production (Vercel serverless)
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -65,8 +65,20 @@ const sendCredentialsEmail = async (email: string, password: string, name: strin
       const data = await response.json();
       console.log(`✅ Email successfully sent to ${email}`, data);
     } else {
-      const error = await response.json();
-      console.warn('⚠️ Email sending failed:', error.message || 'Unknown error');
+      // Try to parse error as JSON, fallback to text
+      let errorMessage = 'Unknown error';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.message || 'Email service error';
+        console.error('⚠️ Email API Error:', errorData);
+      } catch (e) {
+        // Response is not JSON (probably HTML error page)
+        const errorText = await response.text();
+        errorMessage = `Server error (${response.status}): Check Vercel logs`;
+        console.error('⚠️ Email API returned non-JSON response:', errorText.substring(0, 200));
+      }
+      console.warn('⚠️ Email sending failed:', errorMessage);
+      console.warn('💡 Make sure SENDGRID_API_KEY is set in Vercel environment variables');
     }
   } catch (error: any) {
     console.warn('⚠️ Email backend not running. Start email-backend server:', error.message);

@@ -181,6 +181,28 @@ export interface Client {
   updated_at: string;
 }
 
+export interface ClientProject {
+  id: string;
+  client_id: string;
+  client_name: string;
+  project_name: string;
+  project_type: 'Website' | 'Mobile App' | 'Software' | 'Hosting' | 'Domain' | 'Other';
+  description?: string;
+  amount: number;
+  renewal_type?: 'Domain' | 'Hosting' | 'Maintenance' | 'License' | 'None';
+  renewal_date?: string;
+  next_renewal_date?: string;
+  renewal_amount?: number;
+  renewal_status: 'Pending' | 'Paid' | 'Overdue' | 'Cancelled' | 'N/A';
+  payment_status: 'Unpaid' | 'Paid' | 'Partial';
+  amount_paid: number;
+  last_payment_date?: string;
+  auto_renew: boolean;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface InvoiceItem {
   id: string;
   description: string;

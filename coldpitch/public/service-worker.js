@@ -1,5 +1,5 @@
 // Increment version number when you deploy updates
-const CACHE_NAME = 'coldpitch-v2';
+const CACHE_NAME = 'coldpitch-v3-rls-fix';
 const urlsToCache = [
   '/',
   '/index.html',

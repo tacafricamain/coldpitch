@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import './utils/productionDiagnostics'
 
 // Register service worker for PWA with auto-update
 if ('serviceWorker' in navigator) {

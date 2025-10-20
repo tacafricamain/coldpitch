@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Search, Filter, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
 import type { Prospect } from '../../types';
 
 interface ProspectTableProps {
@@ -28,20 +28,6 @@ export default function ProspectTable({
   onStatusFilterChange,
 }: ProspectTableProps) {
   const [selectAll, setSelectAll] = useState(false);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpenMenuId(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -197,66 +183,34 @@ export default function ProspectTable({
                   {prospect.id}
                 </td>
                 <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center gap-2 relative">
+                  <div className="flex items-center gap-1">
+                    {onView && (
+                      <button
+                        onClick={() => onView(prospect)}
+                        className="p-2 hover:bg-blue-50 rounded-lg text-blue-600 transition-colors"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    )}
                     {onEdit && (
                       <button
                         onClick={() => onEdit(prospect)}
-                        className="p-1 hover:bg-blue-50 rounded text-blue-600 hidden md:block"
-                        title="Edit prospect"
+                        className="p-2 hover:bg-green-50 rounded-lg text-green-600 transition-colors"
+                        title="Edit Prospect"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                     )}
-                    <div className="relative" ref={openMenuId === prospect.id ? menuRef : null}>
+                    {onDelete && (
                       <button
-                        onClick={() => setOpenMenuId(openMenuId === prospect.id ? null : prospect.id)}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        onClick={() => onDelete(prospect)}
+                        className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
+                        title="Delete Prospect"
                       >
-                        <MoreVertical className="w-5 h-5 text-gray-400" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-
-                      {/* Dropdown Menu */}
-                      {openMenuId === prospect.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                          {onView && (
-                            <button
-                              onClick={() => {
-                                onView(prospect);
-                                setOpenMenuId(null);
-                              }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                            >
-                              <Eye className="w-4 h-4" />
-                              View Details
-                            </button>
-                          )}
-                          {onEdit && (
-                            <button
-                              onClick={() => {
-                                onEdit(prospect);
-                                setOpenMenuId(null);
-                              }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                            >
-                              <Edit className="w-4 h-4" />
-                              Edit Prospect
-                            </button>
-                          )}
-                          {onDelete && (
-                            <button
-                              onClick={() => {
-                                onDelete(prospect);
-                                setOpenMenuId(null);
-                              }}
-                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </td>
               </tr>

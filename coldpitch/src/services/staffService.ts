@@ -194,19 +194,43 @@ The ColdPitch Team
 export const staffService = {
   // Get all staff members
   async getAllStaff(): Promise<Staff[]> {
+    console.log('👥 Fetching all staff...');
+    console.log('   - Environment:', import.meta.env.MODE);
+    console.log('   - Supabase URL:', import.meta.env.VITE_SUPABASE_URL?.substring(0, 30) + '...');
+    
     const { data, error } = await supabase
       .from('staff')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    console.log('📊 Staff query result:');
+    console.log('   - Error:', error);
+    console.log('   - Data count:', data?.length || 0);
+    console.log('   - First few records:', data?.slice(0, 2)?.map(s => ({ id: s.id, name: s.name, email: s.email })));
 
-    return (data || []).map(staff => ({
+    if (error) {
+      console.error('❌ Error fetching staff:', error);
+      console.error('   - Code:', error.code);
+      console.error('   - Message:', error.message);
+      
+      if (import.meta.env.PROD) {
+        console.error('🚨 PRODUCTION ERROR - Staff query failed');
+        console.error('   - URL exists:', !!import.meta.env.VITE_SUPABASE_URL);
+        console.error('   - Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+      }
+      
+      throw error;
+    }
+
+    const mappedStaff = (data || []).map(staff => ({
       ...staff,
       avatarUrl: staff.avatar_seed 
         ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${staff.avatar_seed}`
         : undefined,
     }));
+    
+    console.log('✅ Mapped staff count:', mappedStaff.length);
+    return mappedStaff;
   },
 
   // Get a single staff member

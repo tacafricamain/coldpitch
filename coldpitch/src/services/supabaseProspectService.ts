@@ -71,6 +71,9 @@ export const prospectService = {
   // Get all prospects
   async getAllProspects(): Promise<Prospect[]> {
     console.log('🔍 Fetching all prospects...');
+    console.log('   - Environment:', import.meta.env.MODE);
+    console.log('   - Supabase URL:', import.meta.env.VITE_SUPABASE_URL?.substring(0, 30) + '...');
+    console.log('   - Anon Key:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Present' : 'Missing');
     
     const { data, error } = await supabase
       .from('prospects')
@@ -88,6 +91,15 @@ export const prospectService = {
       console.error('   - Message:', error.message);
       console.error('   - Details:', error.details);
       console.error('   - Hint:', error.hint);
+      
+      // Additional debugging for production
+      if (import.meta.env.PROD) {
+        console.error('🚨 PRODUCTION ERROR - Additional context:');
+        console.error('   - URL exists:', !!import.meta.env.VITE_SUPABASE_URL);
+        console.error('   - Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+        console.error('   - Supabase client:', supabase);
+      }
+      
       throw error;
     }
 

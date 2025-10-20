@@ -70,17 +70,31 @@ const mapProspectToDb = (prospect: Partial<Prospect>) => {
 export const prospectService = {
   // Get all prospects
   async getAllProspects(): Promise<Prospect[]> {
+    console.log('🔍 Fetching all prospects...');
+    
     const { data, error } = await supabase
       .from('prospects')
       .select('*')
       .order('created_at', { ascending: false });
 
+    console.log('📊 Prospects query result:');
+    console.log('   - Error:', error);
+    console.log('   - Data count:', data?.length || 0);
+    console.log('   - First few records:', data?.slice(0, 3));
+
     if (error) {
-      console.error('Error fetching prospects:', error);
+      console.error('❌ Error fetching prospects:', error);
+      console.error('   - Code:', error.code);
+      console.error('   - Message:', error.message);
+      console.error('   - Details:', error.details);
+      console.error('   - Hint:', error.hint);
       throw error;
     }
 
-    return (data || []).map(mapDbToProspect);
+    const mappedProspects = (data || []).map(mapDbToProspect);
+    console.log('✅ Mapped prospects count:', mappedProspects.length);
+    
+    return mappedProspects;
   },
 
   // Get prospect by ID
